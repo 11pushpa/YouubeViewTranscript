@@ -1,4 +1,6 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -35,7 +37,28 @@ public class ShowTranscriptTest {
 
         WebElement transcript = wait.until(
                 ExpectedConditions.presenceOfElementLocated(By.id("segments-container")));
-        System.out.println(transcript.getText());
+        String trascriptText = transcript.getText();
+
+        // Split input string into lines
+        String[] lines = trascriptText.split("\\r?\\n");
+
+        // Create JSON array with JSON objects for each line
+        JSONArray jsonArray = new JSONArray();
+
+        for (int i = 0; i < lines.length; i += 2) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("time", lines[i]);
+            jsonObject.put("transcript", lines[i + 1]);
+            jsonArray.put(jsonObject);
+        }
+
+        System.out.println("Number of elements: " + jsonArray.length());
+        // Create JSON object with key "output" and value as JSON array
+        JSONObject outputJson = new JSONObject();
+        outputJson.put("output", jsonArray);
+
+        // Print output JSON object
+        System.out.println(outputJson.toString());
 
         // quit the driver
         driver.quit();
